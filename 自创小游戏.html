@@ -35,28 +35,31 @@
         canvas.height = window.innerHeight;
 
         let score = 0;
-        let difficulty = 1; // 难度等级
-        let asteroidFrequency = 0.02; // 小行星生成概率
+        let difficulty = 1;
+        let asteroidFrequency = 0.02;
         const spaceship = {
             x: canvas.width / 2 - 20,
             y: canvas.height - 100,
             width: 40,
             height: 40,
-            speed: 10
+            speed: 5
         };
         const asteroids = [];
         let gameOver = false;
 
+        // 键盘按键状态
+        const keys = {};
+
         // 加载火箭图片
         const spaceshipImage = new Image();
-        spaceshipImage.src = '../mjh042/images/rocket.jpg'; // 请确保路径正确
+        spaceshipImage.src = '../images/rocket.png'; // 请确保路径正确
 
         function createAsteroid() {
             return {
                 x: Math.random() * canvas.width,
                 y: -50,
                 size: Math.random() * 30 + 20,
-                speed: Math.random() * 3 + 2 + difficulty * 0.5 // 难度增加速度
+                speed: Math.random() * 3 + 2 + difficulty * 0.5
             };
         }
 
@@ -94,6 +97,21 @@
             }
         }
 
+        function updateSpaceship() {
+            if (keys['ArrowLeft'] && spaceship.x > 0) {
+                spaceship.x -= spaceship.speed;
+            }
+            if (keys['ArrowRight'] && spaceship.x + spaceship.width < canvas.width) {
+                spaceship.x += spaceship.speed;
+            }
+            if (keys['ArrowUp'] && spaceship.y > 0) {
+                spaceship.y -= spaceship.speed;
+            }
+            if (keys['ArrowDown'] && spaceship.y + spaceship.height < canvas.height) {
+                spaceship.y += spaceship.speed;
+            }
+        }
+
         function gameLoop() {
             if (gameOver) {
                 ctx.fillStyle = 'red';
@@ -105,6 +123,7 @@
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+            updateSpaceship();
             drawSpaceship();
             drawAsteroids();
             updateAsteroids();
@@ -113,26 +132,23 @@
                 asteroids.push(createAsteroid());
             }
 
-            // 每隔一定时间提高难度
             if (score % 10 === 0 && score > 0) {
-                difficulty += 0.1; // 提升难度
-                asteroidFrequency += 0.001; // 增加生成频率
+                difficulty += 0.1;
+                asteroidFrequency += 0.001;
             }
 
             requestAnimationFrame(gameLoop);
         }
 
         window.addEventListener('keydown', (event) => {
-            if (event.key === 'ArrowLeft' && spaceship.x > 0) {
-                spaceship.x -= spaceship.speed;
-            }
-            if (event.key === 'ArrowRight' && spaceship.x + spaceship.width < canvas.width) {
-                spaceship.x += spaceship.speed;
-            }
+            keys[event.key] = true;
         });
 
-        spaceshipImage.onload = gameLoop; // 等待火箭图片加载后开始游戏
+        window.addEventListener('keyup', (event) => {
+            keys[event.key] = false;
+        });
+
+        spaceshipImage.onload = gameLoop;
     </script>
 </body>
 </html>
-
